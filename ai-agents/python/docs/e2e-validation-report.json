@@ -1,0 +1,13 @@
+{
+  "analysis_summary": "Anomaly: CPU utilization below 30% for 14 days\nForecast: Projected steady usage over next 30 days",
+  "e2e_actionable_recommendation": true,
+  "retrieval_used": true,
+  "retrieval_candidates": 58,
+  "retrieval_returned": 5,
+  "retrieval_latency_ms": 42.78,
+  "recommendation_latency_ms": 641.16,
+  "slo_passed": true,
+  "slo_violations": [],
+  "stale_safeguard_passed": true,
+  "source_citation_count": 5
+}

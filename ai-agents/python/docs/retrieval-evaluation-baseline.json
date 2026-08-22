@@ -1,0 +1,9 @@
+{
+  "query_count": 4,
+  "k": 5,
+  "recall_at_k": 1.0,
+  "mrr_at_k": 1.0,
+  "source_citation_coverage": 1.0,
+  "cross_provider_contamination_rate": 0.0,
+  "passed": true
+}

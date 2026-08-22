@@ -1,0 +1,27 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "cloud-finops-ai-agents"
+version = "0.1.0"
+description = "Python AI agent services for Cloud FinOps retrieval and embeddings"
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = [
+  "sentence-transformers==3.0.1",
+  "truststore==0.10.4",
+  "einops==0.8.1",
+  "sqlalchemy==2.0.43",
+  "requests==2.32.5",
+  "beautifulsoup4==4.14.2",
+  "pypdf==6.0.0",
+  "psycopg[binary]>=3.3.4",
+]
+
+[tool.setuptools]
+package-dir = {"" = "."}
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["finops_ai*"]

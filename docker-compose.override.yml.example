@@ -1,0 +1,39 @@
+# Docker Compose Override for Development
+# Copy this file to docker-compose.override.yml and modify as needed
+
+version: '3.8'
+
+services:
+  postgres:
+    environment:
+      # Override with your preferred credentials
+      POSTGRES_PASSWORD: your-secure-password
+
+  azure-consumption-extractor:
+    environment:
+      # Add your Azure credentials here
+      - AZURE_TENANT_ID=your-tenant-id
+      - AZURE_CLIENT_ID=your-client-id
+      - AZURE_CLIENT_SECRET=your-client-secret
+      - AZURE_SUBSCRIPTION_ID=your-subscription-id
+    # Uncomment to enable debugging
+    # ports:
+    #   - "9229:9229"
+    # command: npm run start:debug
+
+  azure-metrics-extractor:
+    environment:
+      # Add your Azure credentials here
+      - AZURE_TENANT_ID=your-tenant-id
+      - AZURE_CLIENT_ID=your-client-id
+      - AZURE_CLIENT_SECRET=your-client-secret
+      - AZURE_SUBSCRIPTION_ID=your-subscription-id
+    # Uncomment to enable debugging
+    # ports:
+    #   - "9230:9229"
+    # command: npm run start:debug
+
+  dashboard:
+    # Uncomment to enable debugging
+    # ports:
+    #   - "9231:9229"

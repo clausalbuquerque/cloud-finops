@@ -1,0 +1,50 @@
+[
+  {
+    "url": "https://docs.cloud.google.com/billing/docs/apis",
+    "title": "APIs & Reference \u00a0|\u00a0 Cloud Billing \u00a0|\u00a0 Google Cloud Documentation",
+    "depth": 1,
+    "score": 5
+  },
+  {
+    "url": "https://cloud.google.com/billing/docs/how-to/export-data-bigquery",
+    "title": "Export Cloud Billing data to BigQuery \u00a0|\u00a0 Google Cloud Documentation",
+    "depth": 0,
+    "score": 3
+  },
+  {
+    "url": "https://docs.cloud.google.com/billing/docs/resources",
+    "title": "Resources \u00a0|\u00a0 Cloud Billing \u00a0|\u00a0 Google Cloud Documentation",
+    "depth": 1,
+    "score": 3
+  },
+  {
+    "url": "https://cloud.google.com/gemini-enterprise-agent-platform/machine-learning/featurestore/latest/overview",
+    "title": "About Feature Store on Gemini Enterprise Agent Platform \u00a0|\u00a0 Google Cloud Documentation",
+    "depth": 1,
+    "score": 3
+  },
+  {
+    "url": "https://cloud.google.com/compute/docs/instances/viewing-and-applying-idle-vm-recommendations",
+    "title": "View and apply idle VM recommendations \u00a0|\u00a0 Compute Engine \u00a0|\u00a0 Google Cloud Documentation",
+    "depth": 0,
+    "score": 2
+  },
+  {
+    "url": "https://cloud.google.com/stackdriver/docs/managed-prometheus",
+    "title": "Google Cloud Managed Service for Prometheus \u00a0|\u00a0 Google Cloud Observability \u00a0|\u00a0 Google Cloud Documentation",
+    "depth": 1,
+    "score": 2
+  },
+  {
+    "url": "https://cloud.google.com/apis/docs/overview",
+    "title": "Google Cloud APIs \u00a0|\u00a0 Google Cloud Documentation",
+    "depth": 1,
+    "score": 2
+  },
+  {
+    "url": "https://cloud.google.com/gemini-enterprise-agent-platform/build/runtime",
+    "title": "Agent Runtime \u00a0|\u00a0 Gemini Enterprise Agent Platform \u00a0|\u00a0 Google Cloud Documentation",
+    "depth": 1,
+    "score": 2
+  }
+]

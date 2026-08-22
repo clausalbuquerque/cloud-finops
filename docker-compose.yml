@@ -1,0 +1,124 @@
+services:
+  postgres:
+    image: pgvector/pgvector:pg18
+    container_name: cloud-finops-postgres
+    environment:
+      POSTGRES_DB: cloud_finops
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres123
+      PGDATA: /var/lib/postgresql/18/docker
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data_pg18:/var/lib/postgresql
+    networks:
+      - cloud-finops
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d cloud_finops"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  azure-consumption-extractor:
+    build:
+      context: ./azure-consumption-extractor
+      dockerfile: Dockerfile
+    container_name: cloud-finops-consumption-extractor
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=development
+      - DB_HOST=postgres
+      - DB_PORT=5432
+      - DB_USERNAME=postgres
+      - DB_PASSWORD=postgres123
+      - DB_DATABASE=cloud_finops
+      - DB_SCHEMA=finops
+      - DB_SYNCHRONIZE=false
+      - DB_LOGGING=true
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - cloud-finops
+    volumes:
+      - ./azure-consumption-extractor:/app
+      - /app/node_modules
+    command: npm run start:dev
+
+  azure-metrics-extractor:
+    build:
+      context: ./azure-metrics-extractor
+      dockerfile: Dockerfile
+    container_name: cloud-finops-metrics-extractor
+    ports:
+      - "3001:3001"
+    environment:
+      - NODE_ENV=development
+      - DB_HOST=postgres
+      - DB_PORT=5432
+      - DB_USERNAME=postgres
+      - DB_PASSWORD=postgres123
+      - DB_DATABASE=cloud_finops
+      - DB_SCHEMA=finops
+      - DB_SYNCHRONIZE=false
+      - DB_LOGGING=true
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - cloud-finops
+    volumes:
+      - ./azure-metrics-extractor:/app
+      - /app/node_modules
+    command: npm run start:dev
+
+  dashboard:
+    build:
+      context: ./dashboard
+      dockerfile: Dockerfile
+    container_name: cloud-finops-dashboard
+    ports:
+      - "3002:3002"
+    environment:
+      - NODE_ENV=development
+      - VITE_API_BASE_URL=http://localhost:3000
+    networks:
+      - cloud-finops
+    volumes:
+      - ./dashboard:/app
+      - /app/node_modules
+    command: npm run dev
+
+  migration-runner:
+    build:
+      context: ./database
+      dockerfile: Dockerfile
+    container_name: cloud-finops-migration-runner
+    environment:
+      - DB_HOST=postgres
+      - DB_PORT=5432
+      - DB_USERNAME=postgres
+      - DB_PASSWORD=postgres123
+      - DB_DATABASE=cloud_finops
+      - DB_SCHEMA=finops
+      - DB_SYNCHRONIZE=false
+      - DB_LOGGING=true
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - cloud-finops
+    volumes:
+      - ./database:/app
+      - /app/node_modules
+    command: ["echo", "Migration runner ready. Use 'docker-compose run --rm migration-runner npm run migration:run' to run migrations"]
+    profiles:
+      - tools
+
+volumes:
+  postgres_data_pg18:
+
+networks:
+  cloud-finops:
+    driver: bridge

@@ -1,0 +1,53 @@
+# Dependencies
+node_modules/
+
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# Build output
+dist/
+build/
+
+# Environment files
+.env
+.env.local
+.env.*.local
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Coverage
+coverage/
+
+# Source maps
+*.js.map
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+
+# TypeORM
+ormlogs.log
+
+# Docker
+docker-compose.override.yml
+
+# Temporary files
+tmp/
+temp/

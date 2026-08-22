@@ -1,0 +1,32 @@
+[
+  {
+    "url": "https://docs.cloud.google.com/compute/docs/resources",
+    "title": "Resources \u00a0|\u00a0 Compute Engine \u00a0|\u00a0 Google Cloud Documentation",
+    "depth": 1,
+    "score": 2
+  },
+  {
+    "url": "https://cloud.google.com/compute/docs/resources",
+    "title": "Resources \u00a0|\u00a0 Compute Engine \u00a0|\u00a0 Google Cloud Documentation",
+    "depth": 1,
+    "score": 2
+  },
+  {
+    "url": "https://cloud.google.com/compute/docs/instances/creating-instance-with-custom-machine-type",
+    "title": "Create a VM with a custom machine type \u00a0|\u00a0 Compute Engine \u00a0|\u00a0 Google Cloud Documentation",
+    "depth": 1,
+    "score": 2
+  },
+  {
+    "url": "https://cloud.google.com/compute/docs/instances/about-flex-start-vms",
+    "title": "About Flex-start VMs \u00a0|\u00a0 Compute Engine \u00a0|\u00a0 Google Cloud Documentation",
+    "depth": 1,
+    "score": 2
+  },
+  {
+    "url": "https://cloud.google.com/compute/docs/instances/about-reservation-bound-instances",
+    "title": "About instances that use the reservation-bound model \u00a0|\u00a0 Compute Engine \u00a0|\u00a0 Google Cloud Documentation",
+    "depth": 1,
+    "score": 2
+  }
+]

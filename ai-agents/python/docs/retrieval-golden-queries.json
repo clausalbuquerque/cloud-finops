@@ -1,0 +1,98 @@
+{
+  "version": "1.0.0",
+  "description": "Golden retrieval queries for Cloud FinOps provider-context grounding checks",
+  "thresholds": {
+    "min_recall_at_k": 0.75,
+    "min_mrr_at_k": 0.65,
+    "min_source_citation_coverage": 0.75,
+    "max_cross_provider_contamination_rate": 0.0
+  },
+  "queries": [
+    {
+      "case_id": "gcp-sku-rightsize",
+      "provider": "GCP",
+      "resource_type": "compute/instance",
+      "category": "rightsizing",
+      "query": "Which GCP machine type is recommended when n2-standard-8 has CPU consistently below 25%?",
+      "expected_chunk_ids": ["gcp-rightsize-n2-to-n2-standard-4"],
+      "expected_source_domains": ["cloud.google.com"],
+      "disallowed_providers": ["AWS", "AZURE"]
+    },
+    {
+      "case_id": "gcp-cli-resize",
+      "provider": "GCP",
+      "resource_type": "compute/instance",
+      "category": "cli",
+      "query": "What gcloud command updates a Compute Engine instance machine type?",
+      "expected_chunk_ids": ["gcp-cli-set-machine-type"],
+      "expected_source_domains": ["cloud.google.com"],
+      "disallowed_providers": ["AWS", "AZURE"]
+    },
+    {
+      "case_id": "gcp-pricing-context",
+      "provider": "GCP",
+      "resource_type": "compute/instance",
+      "category": "pricing",
+      "query": "Where should we verify current on-demand pricing before accepting monthly savings estimates?",
+      "expected_chunk_ids": ["gcp-pricing-catalog"],
+      "expected_source_domains": ["cloud.google.com"],
+      "disallowed_providers": ["AWS", "AZURE"]
+    },
+    {
+      "case_id": "gcp-constraint-preemptible",
+      "provider": "GCP",
+      "resource_type": "compute/instance",
+      "category": "constraints",
+      "query": "What workload constraint should block recommendations to Spot/Preemptible VMs?",
+      "expected_chunk_ids": ["gcp-spot-constraint-stateful"],
+      "expected_source_domains": ["cloud.google.com"],
+      "disallowed_providers": ["AWS", "AZURE"]
+    }
+  ],
+  "fixture_ranked_results": {
+    "gcp-sku-rightsize": [
+      {
+        "chunk_id": "gcp-rightsize-n2-to-n2-standard-4",
+        "provider": "GCP",
+        "source_url": "https://cloud.google.com/compute/docs/machine-types",
+        "score": 0.93
+      },
+      {
+        "chunk_id": "gcp-pricing-catalog",
+        "provider": "GCP",
+        "source_url": "https://cloud.google.com/compute/all-pricing",
+        "score": 0.80
+      }
+    ],
+    "gcp-cli-resize": [
+      {
+        "chunk_id": "gcp-cli-set-machine-type",
+        "provider": "GCP",
+        "source_url": "https://cloud.google.com/sdk/gcloud/reference/compute/instances/set-machine-type",
+        "score": 0.95
+      }
+    ],
+    "gcp-pricing-context": [
+      {
+        "chunk_id": "gcp-pricing-catalog",
+        "provider": "GCP",
+        "source_url": "https://cloud.google.com/compute/all-pricing",
+        "score": 0.91
+      },
+      {
+        "chunk_id": "gcp-rightsize-n2-to-n2-standard-4",
+        "provider": "GCP",
+        "source_url": "https://cloud.google.com/compute/docs/machine-types",
+        "score": 0.82
+      }
+    ],
+    "gcp-constraint-preemptible": [
+      {
+        "chunk_id": "gcp-spot-constraint-stateful",
+        "provider": "GCP",
+        "source_url": "https://cloud.google.com/compute/docs/instances/spot",
+        "score": 0.90
+      }
+    ]
+  }
+}
