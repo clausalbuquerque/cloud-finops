@@ -167,7 +167,13 @@ app.get('/api/optimizations', async (req, res) => {
           is_high_spend: isHighSpend,
           financial_impact_usd: savings,
           reasons,
-        }
+        },
+        current_state: r.current_state,
+        proposed_state: r.proposed_state,
+        confidence_score: r.confidence_score,
+        sre_assessment: r.sre_assessment,
+        recommendation_type: r.recommendation_type,
+        provider_name: r.provider_name,
       };
     });
     
@@ -211,6 +217,85 @@ app.post('/api/optimizations/batch-approve', async (req, res) => {
     );
 
     res.json({ status: 'ok', approved_count: ids.length });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+app.post('/api/optimizations/:id/approve', async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { notes, reviewer } = req.body || {};
+
+    const itemRes = await pool.query(
+      `SELECT id, resource_id, status, estimated_monthly_savings FROM finops.optimization_recommendations WHERE id = $1`,
+      [id]
+    );
+
+    if (itemRes.rows.length === 0) {
+      return res.status(404).json({ error: `Recommendation with ID '${id}' not found` });
+    }
+
+    const rec = itemRes.rows[0];
+    if (rec.status === 'approved' || rec.status === 'executed') {
+      return res.status(400).json({ error: `Recommendation is already ${rec.status}` });
+    }
+
+    await pool.query(
+      `UPDATE finops.optimization_recommendations 
+       SET status = 'approved', 
+           resolved_at = NOW(), 
+           updated_at = NOW() 
+       WHERE id = $1`,
+      [id]
+    );
+
+    res.json({
+      status: 'approved',
+      recommendation_id: id,
+      resource_id: rec.resource_id,
+      approved_by: reviewer || 'dashboard_operator',
+      approved_at: new Date().toISOString(),
+      notes,
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+app.post('/api/optimizations/:id/reject', async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { reason, reviewer } = req.body || {};
+
+    const itemRes = await pool.query(
+      `SELECT id, resource_id, status FROM finops.optimization_recommendations WHERE id = $1`,
+      [id]
+    );
+
+    if (itemRes.rows.length === 0) {
+      return res.status(404).json({ error: `Recommendation with ID '${id}' not found` });
+    }
+
+    await pool.query(
+      `UPDATE finops.optimization_recommendations 
+       SET status = 'rejected', 
+           rejection_reason = $1, 
+           resolved_at = NOW(), 
+           updated_at = NOW() 
+       WHERE id = $2`,
+      [reason || 'Rejected during individual review sign-off.', id]
+    );
+
+    res.json({
+      status: 'rejected',
+      recommendation_id: id,
+      rejected_by: reviewer || 'dashboard_operator',
+      rejected_at: new Date().toISOString(),
+      reason,
+    });
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: 'Internal server error' });
@@ -311,13 +396,22 @@ app.post('/api/chat', async (req, res) => {
   res.setHeader('Cache-Control', 'no-cache');
   res.setHeader('Connection', 'keep-alive');
 
+  // If team is not explicitly provided, extract from [Context: ... for <team>] if present
+  let resolvedTeam = team;
+  if (!resolvedTeam && typeof message === 'string') {
+    const match = message.match(/\[Context:[^\]]*for\s+([a-zA-Z0-9_-]+)\]/i);
+    if (match && match[1] && match[1].toLowerCase() !== 'all') {
+      resolvedTeam = match[1];
+    }
+  }
+
   try {
     const response = await fetch('http://localhost:8000/api/chat', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({ query: message, team: team || 'data-platform' })
+      body: JSON.stringify({ query: message, team: resolvedTeam || undefined })
     });
 
     if (!response.body) throw new Error("No response body");

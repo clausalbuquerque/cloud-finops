@@ -3,6 +3,7 @@ import type { ReactNode, KeyboardEvent, FormEvent } from 'react';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import { Send, Bot, User, Loader2, BrainCircuit, ChevronDown, ChevronRight, X, Maximize2, Minimize2 } from 'lucide-react';
+import { useTeam } from '../contexts/TeamContext';
 
 class ErrorBoundary extends Component<{children: ReactNode}, {hasError: boolean, error: Error | null}> {
   constructor(props: any) {
@@ -34,6 +35,7 @@ interface ChatPanelProps {
 }
 
 export default function ChatPanel({ isOpen, onClose, contextText }: ChatPanelProps) {
+  const { selectedTeam } = useTeam();
   const [messages, setMessages] = useState<Message[]>([
     { role: 'model', content: "Hi! Ask me any questions about your Cloud FinOps data." }
   ]);
@@ -91,7 +93,8 @@ export default function ChatPanel({ isOpen, onClose, contextText }: ChatPanelPro
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           message: contextText ? `[Context: ${contextText}] ${textToSend.trim()}` : textToSend.trim(),
-          history: currentMessages.slice(0, -1)
+          history: currentMessages.slice(0, -1),
+          team: selectedTeam && selectedTeam !== 'all' ? selectedTeam : undefined,
         })
       });
 

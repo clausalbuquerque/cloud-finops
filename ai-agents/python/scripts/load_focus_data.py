@@ -59,7 +59,7 @@ def main() -> int:
     print(f"Loading FOCUS data from {file_path} into {db_url.split('@')[-1]}...")
     loader = FocusDataLoader.from_url(db_url)
 
-    result = loader.load_file(file_path, batch_size=args.batch_size)
+    result = loader.load_file(file_path, batch_size=args.batch_size, backfill_history=True)
 
     print("\n--- FOCUS Load Results ---")
     print(f"Total Rows Read:        {result.total_rows_read}")

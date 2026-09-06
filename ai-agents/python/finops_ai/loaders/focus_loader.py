@@ -337,9 +337,10 @@ class FocusDataLoader:
         row_iterator: Iterator[dict[str, str]],
         batch_size: int = 500,
         source_provenance: str = "FOCUS-1.0-sample",
+        backfill_history: bool = False,
     ) -> FocusLoadResult:
         """Stream and persist rows from a CSV DictReader iterator in batches.
-        Automatically shifts and expands the sample data backwards month-by-month to 2025-01.
+        Optionally shifts and expands the sample data backwards month-by-month to 2025-01 if backfill_history=True.
         """
         result = FocusLoadResult()
         batch: list[dict[str, Any]] = []
@@ -352,11 +353,13 @@ class FocusDataLoader:
                     base_mapped = self.map_focus_row(row, source_provenance=source_provenance)
                     orig_usage_date = base_mapped["usage_date"]
                     
-                    # Calculate how many months to shift backwards from the CSV date to 2025-01
-                    months_diff = (orig_usage_date.year - target_start.year) * 12 + (orig_usage_date.month - target_start.month)
-                    months_diff = max(0, months_diff)
+                    if backfill_history and orig_usage_date:
+                        months_diff = (orig_usage_date.year - target_start.year) * 12 + (orig_usage_date.month - target_start.month)
+                        months_diff = max(0, months_diff)
+                    else:
+                        months_diff = 0
                     
-                    # Duplicate the row for every month between the original date and 2025-01
+                    # Duplicate the row for every month between the original date and 2025-01 if backfilling
                     for month_offset in range(months_diff + 1):
                         mapped = dict(base_mapped)
                         
@@ -489,7 +492,7 @@ class FocusDataLoader:
         session.commit()
 
     def load_file(
-        self, file_path: str | Path, batch_size: int = 500
+        self, file_path: str | Path, batch_size: int = 500, backfill_history: bool = False
     ) -> FocusLoadResult:
         """Load FOCUS data from a local .csv or .csv.gz file."""
         path = Path(file_path)
@@ -500,9 +503,19 @@ class FocusDataLoader:
         if path.suffix == ".gz" or str(path).endswith(".csv.gz"):
             with gzip.open(path, mode="rt", encoding="utf-8") as f:
                 reader = csv.DictReader(f)
-                return self.load_stream(reader, batch_size=batch_size, source_provenance=source_provenance)
+                return self.load_stream(
+                    reader,
+                    batch_size=batch_size,
+                    source_provenance=source_provenance,
+                    backfill_history=backfill_history,
+                )
         else:
             with open(path, mode="r", encoding="utf-8") as f:
                 reader = csv.DictReader(f)
-                return self.load_stream(reader, batch_size=batch_size, source_provenance=source_provenance)
+                return self.load_stream(
+                    reader,
+                    batch_size=batch_size,
+                    source_provenance=source_provenance,
+                    backfill_history=backfill_history,
+                )
 

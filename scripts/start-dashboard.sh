@@ -25,8 +25,23 @@ echo "==========================================================================
 echo ""
 echo "==> Starting Python Agent Engine (FastAPI on Port 8000)..."
 cd "$REPO_ROOT/ai-agents/python"
-uv run python scripts/run_fastapi.py &
+if command -v uv >/dev/null 2>&1; then
+  uv run --python .venv/bin/python python scripts/run_fastapi.py &
+elif [ -f ".venv/bin/python" ]; then
+  .venv/bin/python scripts/run_fastapi.py &
+else
+  python3 scripts/run_fastapi.py &
+fi
 API_PID=$!
+
+echo "Waiting for Python Agent Engine to be ready on port 8000..."
+for i in {1..30}; do
+  if curl -s http://localhost:8000/health >/dev/null 2>&1; then
+    echo "    ✓ Python Agent Engine is healthy and listening on port 8000"
+    break
+  fi
+  sleep 0.5
+done
 
 echo "==> Starting BFF Express Server (Port 3001)..."
 cd "$REPO_ROOT/dashboard/server"
@@ -44,6 +59,6 @@ echo "➡️  Open your browser to: http://localhost:5173"
 echo "Press Ctrl+C to stop all services."
 
 # Trap Ctrl+C to kill background processes
-trap "echo 'Stopping services...'; kill $API_PID $BFF_PID $UI_PID; exit" INT TERM
+trap "echo 'Stopping services...'; kill $API_PID $BFF_PID $UI_PID 2>/dev/null || true; exit" INT TERM
 wait
 
