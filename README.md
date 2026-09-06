@@ -1,189 +1,254 @@
-# DW AI Cloud FinOps
+# Cloud FinOps AI Agent Platform
 
-This project is a set of analytics tools to follow up the cloud consumption of DW AI projects (Stellar, DW AI portal, DW AI Insights, GPTap (Rip)).
+An autonomous, multi-agent cloud financial operations and infrastructure reliability platform. Built around the **FinOps Open Cost and Usage Specification (FOCUS 1.0)**, the platform coordinates specialized AI agents (FinOps Specialist and SRE Specialist) with dual Evaluator-Optimizer feedback loops, defense-in-depth safety guardrails, tiered autonomy, and post-execution canary telemetry monitoring.
 
-We build tools to extract cloud consumption data directly from Azure and identify possible optimizations. The aim is to achieve at least **10% of cloud savings** while expanding our product landscape and use cases.
+---
 
-## Tech Stack
+## 🔒 Data Provenance & Synthetic Privacy Notice
 
-- **Language**: TypeScript (strict mode)
-- **Backend Framework**: NestJS
-- **ORM**: TypeORM
-- **Database**: PostgreSQL
-- **Testing**: Jest
+> [!IMPORTANT]
+> **No proprietary, customer, or enterprise production data is stored or processed in this repository.**
+> 
+> - **Public Foundation**: All cloud billing records originate exclusively from the publicly available **FinOps Open Cost and Usage Specification (FOCUS 1.0)** sample dataset published by the FinOps Foundation.
+> - **Synthetic Generation**: Historical billing rows, time-series usage trends, and infrastructure utilization metrics (CPU, Memory, IOPS, network) are synthetically generated and backfilled using statistical workload profiles (steady-state, spiky batch, warm standby, in-memory cache).
+> - **Anonymized Metadata**: All resource IDs, subscription UUIDs, project identifiers, and resource tags are synthetic mock values designed strictly to demonstrate multi-agent reasoning, policy gating, and blast-radius isolation without exposing real infrastructure assets.
 
-## Project Structure
+---
+
+## 🏗️ Architecture & Agentic Capabilities
+
+The platform implements a collaborative, multi-agent pattern with separation of concerns:
 
 ```
-cloud-finops/
-├── azure-consumption-extractor/   # Azure Cost Management API integration
-├── azure-metrics-extractor/       # Azure resource usage metrics collection
-├── dashboard/                     # Frontend visualization and reporting
-├── database/                      # Shared entities, migrations, DataSource
-├── ai-agents/                     # AI-powered analysis agents (TBD)
-└── .ai/                           # AI agent configuration and task tracking
+┌─────────────────────────────────────────────────────────────────────────────────────────┐
+│                                    Cloud FinOps Core                                    │
+└─────────────────────────────────────────────────────────────────────────────────────────┘
+                                             │
+                       ┌─────────────────────┴─────────────────────┐
+                       ▼                                           ▼
+          ┌─────────────────────────┐                 ┌─────────────────────────┐
+          │  FinOps Specialist Agent│                 │   SRE Specialist Agent  │
+          │  (Cost, Billing & FOCUS)│                 │   (Telemetry & Safety)  │
+          └─────────────────────────┘                 └─────────────────────────┘
+                       │                                           │
+                       ▼                                           ▼
+          ┌─────────────────────────┐                 ┌─────────────────────────┐
+          │   FinOps Safety Judge   │                 │     SRE Safety Judge    │
+          │   (Evaluator-Optimizer) │                 │   (Evaluator-Optimizer) │
+          └─────────────────────────┘                 └─────────────────────────┘
+                       │                                           │
+                       └─────────────────────┬─────────────────────┘
+                                             ▼
+                              ┌─────────────────────────────┐
+                              │  Deterministic Policy Gates │
+                              │  (Sanitization & Headroom)  │
+                              └─────────────────────────────┘
+                                             │
+                       ┌─────────────────────┴─────────────────────┐
+                       ▼                                           ▼
+          ┌─────────────────────────┐                 ┌─────────────────────────┐
+          │ Tier 1: Low Risk (Dev)  │                 │ Tier 2: High Risk (Prod)│
+          │ Autonomous/Batch Review │                 │ Mandatory Human Sign-Off│
+          └─────────────────────────┘                 └─────────────────────────┘
+                                             │
+                                             ▼
+                              ┌─────────────────────────────┐
+                              │    Canary Telemetry Watcher │
+                              │    & 1-Click Rollback Engine│
+                              └─────────────────────────────┘
 ```
 
-## Prerequisites
+### 1. Dual Specialist Agents with Evaluator-Optimizer Loops
+- **FinOps Specialist Agent**: Analyzes FOCUS 1.0 billing data, identifies top spenders, detects cost anomalies, looks up official cloud catalog SKUs, and calculates rightsizing/cleanup proposals. Uses read-only analysis tools.
+- **SRE Specialist Agent**: Independent validation gate. Inspects multi-day utilization telemetry (CPU/Memory P95), evaluates workload baselines (e.g. batch spikes, disaster recovery standbys), and checks service dependencies.
+- **Domain Judges & Rubrics**: Specialized LLM judges score recommendations against rubrics for cost math accuracy, source attribution, and operational headroom, triggering iterative refinement before proposals progress.
 
-- **Node.js** >= 20 LTS
-- **npm** >= 10
-- **PostgreSQL** >= 18
-- **Docker** >= 20.10 (optional, for containerized development)
-- **Azure credentials** with appropriate RBAC roles — see [Azure Permissions Guide](docs/azure-permissions.md)
+### 2. Defense-in-Depth Safety Guardrails
+- **Input Metadata Sanitization & Structural Isolation**: Neutralizes indirect prompt injection attacks embedded within cloud metadata tags, resource names, and billing descriptions by stripping control characters, escaping prompt delimiters, and isolating untrusted fields in `<untrusted_metadata>` tags.
+- **Deterministic Confidence Calibration**: Computes an objective evidence score:
+  $$\text{Confidence} = (0.35 \times \text{Telemetry Completeness}) + (0.40 \times \text{Headroom Margin}) + (0.25 \times \text{Catalog Match})$$
+  Fails closed to human review with an **Ambiguity Warning** if confidence $< 0.85$ or if critical telemetry (e.g. memory) is missing.
+- **5 Deterministic Policy Gates**: Enforces data freshness, calibrated confidence thresholds, memory of prior user rejections, dependency safety, and headroom limits before any action is approved.
 
-## Environment Configuration
+### 3. Tiered Autonomy & Blast-Radius Engine
+- **Tier 1 (Low Risk / Non-Production)**: Dev and sandbox environments with estimated monthly impact under \$50 allow batched or asynchronous review to prevent engineer alert fatigue.
+- **Tier 2 (High Risk / Production)**: Any optimization targeting production environments (`env: prod`), stateful databases, storage volumes, or shared clusters requires explicit, individualized human sign-off.
 
-The project uses a **single source of truth** for environment variables: the root `.env`.
-Edit it once, then run the sync script to distribute copies to every sub-project.
+### 4. Post-Execution Canary Telemetry Monitor & Rollback Engine
+- Following approved execution, the system initiates a **60-minute canary observation window**.
+- If CPU/Memory utilization exceeds 90% or application error rate spikes occur, a high-priority alert is emitted and a **1-click rollback action** reverts the resource to its pre-execution baseline SKU.
 
-```bash
-cp .env.example .env          # create the root .env
-# edit .env — set Azure creds, GCP_AGENTS_API_KEY, DB password, etc.
-./scripts/sync-env.sh         # copy it to all sub-projects (--check for a dry run)
-```
+### 5. Golden Benchmark Test Suite & Automated Evaluator Pipeline
+- Versioned dataset of **52 historical cloud optimization scenarios** across 8 categories (steady-state underused, spiky batch, warm standby, memory-bound, stateful production, missing telemetry, prompt injection attempts, canary spikes).
+- Automated evaluator pipeline measuring Groundedness ($100\%$), SRE Veto Recall ($100\%$), Expected Calibration Error ($\text{ECE} = 0.0389 \le 0.150$), and Tier 2 Isolation Precision ($100\%$).
 
-`sync-env.sh` writes a generated `.env` into `azure-consumption-extractor/`,
-`azure-metrics-extractor/`, `database/`, and `ai-agents/python/`. Those copies are
-marked "DO NOT EDIT" and are overwritten on every run — always change the root `.env`.
-All `.env` files are gitignored; never commit them.
+---
 
-## Quick Start with Docker Compose
+## 💻 Tech Stack
 
-The easiest way to get started is using Docker Compose, which sets up PostgreSQL with persistent data and all services:
+- **AI Agent Engine**: Python 3.12, CrewAI, LangChain, Pydantic v2, `google-genai` (Gemini 2.5 Flash / Pro)
+- **Frontend Dashboard**: React 18, Vite, Tailwind CSS, Lucide Icons, Server-Sent Events (SSE)
+- **Backend-For-Frontend (BFF)**: Node.js, Express, TypeScript
+- **Database & Storage**: PostgreSQL 16 with `pgvector` extension, TypeORM (migrations & entities)
+- **Package & Dependency Management**: `uv` (Python), `npm` (Node.js), Docker & Docker Compose
+
+---
+
+## 🚀 Quick Start: Running Locally
+
+### Prerequisites
+- **Docker & Docker Compose** (Docker Desktop recommended)
+- **Node.js** >= 20 LTS & **npm** >= 10
+- **Python** >= 3.11 with **`uv`** installed (`curl -LsSf https://astral.sh/uv/install.sh | sh`)
+- **Google Gemini API Key** (`GEMINI_API_KEY` or `GCP_AGENTS_API_KEY`)
+
+---
+
+### Step 1: Clone and Configure Environment
 
 ```bash
 # Clone the repository
-git clone <repository-url>
+git clone https://github.com/clausalbuquerque/cloud-finops.git
 cd cloud-finops
 
-# Configure environment (single source of truth)
+# Create the root .env configuration
 cp .env.example .env
-# Edit .env with your Azure credentials, GCP key, and other settings
+
+# Edit .env and supply your Gemini API key:
+# GEMINI_API_KEY="your-api-key-here"
+# GCP_AGENTS_API_KEY="your-api-key-here"
+
+# Distribute the environment configuration to all sub-projects
 ./scripts/sync-env.sh
-cp docker-compose.override.yml.example docker-compose.override.yml
-
-# Note: docker-compose sets its own DB env; the .env files are for running services locally
-
-# Start all services
-docker-compose up --build
-
-# Or run in background
-docker-compose up -d --build
 ```
 
-**Services will be available at:**
-- **Consumption Extractor API**: http://localhost:3000
-- **Metrics Extractor API**: http://localhost:3001
-- **Dashboard**: http://localhost:3002
-- **PostgreSQL**: localhost:5432 (database: `cloud_finops`, schema: `finops`)
+---
 
-**Database Persistence:**
-- PostgreSQL data is persisted in a Docker volume (`postgres_data`)
-- Run `docker-compose down` to stop services (data persists)
-- Run `docker-compose down -v` to also remove persistent data
+### Step 2: Bootstrap the Local Environment
 
-## Manual Development Setup
-
-If you prefer to run services individually without Docker:
-
-Each sub-project is self-contained with its own `package.json`. Navigate to a sub-project and install dependencies:
+The bootstrap script automates container startup, database migrations, sample data seeding, and readiness checks:
 
 ```bash
-# Azure Consumption Extractor
-cd azure-consumption-extractor
-npm install
-npm run build
-npm run start:dev
+./scripts/setup-local-env.sh
+```
 
-# Azure Metrics Extractor
-cd azure-metrics-extractor
-npm install
-npm run build
-npm run start:dev
+What this script executes:
+1. Validates and distributes `.env` across services.
+2. Starts the PostgreSQL 16 + `pgvector` container on port `5433` (Docker Compose).
+3. Applies TypeORM migrations (Core schema, Metrics, Agent Memory, and Predictions).
+4. Seeds the FOCUS 1.0 dataset, generates synthetic utilization metrics, and computes spend forecasts.
+5. Verifies database connectivity and agent memory repository health.
 
-# Database (shared library)
+---
+
+### Step 3: Launch the Fullstack Application
+
+To launch the entire platform (FastAPI Agent Engine, BFF Express Server, and Vite React Dashboard) in a single command:
+
+```bash
+./scripts/start-dashboard.sh
+```
+
+Once started, the services are available at:
+
+| Component | URL | Description |
+|---|---|---|
+| **Vite React Dashboard** | [http://localhost:5173](http://localhost:5173) | Interactive UI with real-time SSE chat, batch approvals & canary rollback |
+| **BFF Express Server** | [http://localhost:3001](http://localhost:3001) | REST & SSE API bridging UI with PostgreSQL and Agent service |
+| **FastAPI Agent Engine** | [http://localhost:8000](http://localhost:8000) | Python agent orchestration and streaming chat endpoint (`/api/chat`) |
+| **PostgreSQL + pgvector** | `localhost:5433` | Database: `cloud_finops`, Schema: `finops` |
+
+---
+
+## 🤖 CLI & Standalone Agent Workflows
+
+If you wish to interact with or evaluate the AI agents directly from the command line:
+
+### 1. Interactive Terminal Chat
+```bash
+cd ai-agents/python
+uv run python scripts/chat_finops_agent.py
+```
+
+### 2. Run the Golden Benchmark Evaluator Pipeline
+Executes all 52 historical cloud optimization scenarios and generates a quantitative scorecard:
+```bash
+cd ai-agents/python
+uv run python scripts/run_golden_evaluator.py
+```
+Output report is persisted to `ai-agents/python/docs/golden-benchmark-report.json`.
+
+### 3. Run Headless Orchestration Flow
+```bash
+cd ai-agents/python
+uv run python scripts/run_finops_flow.py
+```
+
+---
+
+## 🧪 Testing & Verification
+
+### Run Safety & Guardrails Test Suite
+```bash
+cd ai-agents/python
+uv run python -m unittest tests/test_golden_evaluator.py tests/test_guardrails_calibration.py tests/test_guardrails_sanitizer.py tests/test_policy_gates.py tests/test_blast_radius.py tests/test_canary_monitor.py
+```
+- **44/44 unit and safety tests pass** covering input sanitization, deterministic calibration, blast-radius isolation, canary rollback, and golden benchmark execution.
+
+### Run Database Entity & Migration Tests
+```bash
 cd database
-npm install
+npm test
+```
+
+### Verify Dashboard Build
+```bash
+cd dashboard
 npm run build
+cd server && npm run build
 ```
 
-## Environment Variables
+---
 
-Each sub-project has a `.env.example` file. Copy it to `.env` and fill in the values:
+## 📁 Repository Structure
 
-```bash
-cp .env.example .env
+```
+cloud-finops/
+├── ai-agents/
+│   └── python/
+│       ├── finops_ai/
+│       │   ├── agents/          # FinOps & SRE Specialist Agent definitions
+│       │   ├── guardrails/      # Input sanitization & confidence calibration scorer
+│       │   ├── hitl/            # Human-in-the-loop approval & rollback engine
+│       │   ├── judges/          # Evaluator-Optimizer judges & domain rubrics
+│       │   ├── memory/          # Episodic & semantic pgvector interaction repository
+│       │   ├── monitoring/      # Post-execution canary watcher
+│       │   ├── orchestration/   # FinOpsFlow state machine, policy gates & delegation
+│       │   ├── policies/        # Tiered autonomy & blast-radius classifier
+│       │   ├── predictions/     # Anomaly detector & Holt-Winters forecaster
+│       │   └── tools/           # Cost querying, infra telemetry, and SKU retrieval tools
+│       ├── scripts/             # CLI runners, dataset generator, benchmark evaluator
+│       └── tests/               # Unit, integration, and golden benchmark test suites
+├── dashboard/
+│   ├── src/                     # React 18 frontend (Vite, Tailwind, SSE ChatPanel)
+│   └── server/                  # Node.js Express BFF server (batch review, rollback API)
+├── database/
+│   ├── src/entities/            # TypeORM entities (FOCUS consumption, memory, metrics)
+│   ├── migrations/              # Database migration definitions
+│   └── tests/                   # Entity and migration unit tests
+├── docs/
+│   ├── multi-agent-architecture.md   # Architectural design specification
+│   └── safety_and_intervention_plan.md # Safety, guardrails & HITL plan
+├── scripts/
+│   ├── setup-local-env.sh       # One-click environment bootstrap & health check
+│   ├── start-dashboard.sh       # One-click runner for UI, BFF, and Agent FastAPI
+│   └── sync-env.sh              # Single source of truth .env distribution
+├── docker-compose.yml           # PostgreSQL 16 + pgvector container configuration
+└── .env.example                 # Root environment variables template
 ```
 
-## Database Migrations
+---
 
-### With Docker Compose
-```bash
-# Run migrations using the migration runner service
-docker-compose --profile tools run --rm migration-runner npm run migration:run
+## 📄 License
 
-# Check migration status
-docker-compose --profile tools run --rm migration-runner npm run migration:show
-
-# Revert the last migration
-docker-compose --profile tools run --rm migration-runner npm run migration:revert
-```
-
-### Manual Setup
-```bash
-cd database
-npm run migration:run       # Apply all pending migrations
-npm run migration:revert    # Revert the last migration
-npm run migration:show      # Show migration status
-```
-
-## Running Tests
-
-```bash
-cd <sub-project>
-npm run test        # Unit tests
-npm run test:cov    # Unit tests with coverage
-npm run test:e2e    # End-to-end tests (extractors only)
-```
-
-## Sub-Projects
-
-### Azure Consumption Extractor (`azure-consumption-extractor/`)
-NestJS service that extracts cloud cost data via the Azure Cost Management API and persists it to the database. Includes:
-- **CostModule** — `AzureCostClientService` for querying cost data with flexible date ranges, subscriptions, granularity, and groupBy dimensions. Retry logic with exponential backoff + jitter for 429/5xx.
-- **DatabaseModule** — TypeORM connection to PostgreSQL (`finops` schema) with entities for subscriptions, resource groups, and consumption records.
-- **ExtractionModule** — `ConsumptionExtractorService` orchestrating the full pipeline: fetch → map → ensure subscriptions/resource groups → upsert consumption records in batches with transaction handling. Supports chunked date ranges (31-day chunks) and idempotent re-runs.
-- Auth: `ClientSecretCredential` with `DefaultAzureCredential` fallback
-- **Tests**: 47 unit tests (3 suites)
-- Port: **3000**
-
-### Azure Metrics Extractor (`azure-metrics-extractor/`)
-NestJS service that collects resource utilization metrics from Azure Monitor to detect underused resources. Includes:
-- **MetricsModule** — Azure API clients: `AzureResourceClientService` (ARM resource discovery), `AzureMonitorClientService` (metric queries, batch API), `UtilizationMetricsRegistry` (6 resource types, 25 metrics)
-- **DatabaseModule** — TypeORM connection with local entity copies: `TrackedResourceEntity`, `MetricDefinitionEntity`, `MetricDataPointEntity`, `UtilizationSummaryEntity`, `SubscriptionEntity`, `ResourceGroupEntity`
-- **ExtractionModule** — orchestration and analytics:
-  - `MetricsExtractorService` — full pipeline: discover resources → sync to DB → fetch metrics via Batch API → persist data points in batched transactions
-  - `UtilizationSummaryService` — daily roll-ups with avg/min/max/p95 computation, configurable underuse thresholds (CPU <10%, Memory <20%, DTU/RU <15%, Storage <10%), `is_underused` flagging
-- Configurable thresholds via `underuseThresholdsConfig` (env-var overrides per metric type)
-- Auth: `ClientSecretCredential` with `DefaultAzureCredential` fallback
-- **Tests**: 99 unit tests (6 suites)
-- Port: **3001**
-
-### Cloud FinOps Database (`database/`)
-Shared TypeORM library containing entity definitions, migrations, and the DataSource configuration consumed by the extractors.
-- **Schema**: `finops` (PostgreSQL)
-- **Core Entities**: `SubscriptionEntity`, `ResourceGroupEntity`, `ConsumptionRecordEntity` (FOCUS-compliant, 25+ fields)
-- **Metrics Entities**: `TrackedResourceEntity`, `MetricDefinitionEntity`, `MetricDataPointEntity`, `UtilizationSummaryEntity`
-- **Enums**: `MetricUnit` (13 values), `AggregationType` (6 values), `TimeGrain` (8 ISO 8601 durations)
-- **Migrations**:
-  - `InitialCoreSchema` — creates `subscriptions`, `resource_groups`, `consumption_records` tables
-  - `AddMetricsSchema` — creates `tracked_resources`, `metric_definitions`, `metric_data_points`, `utilization_summaries` tables with enum types, composite indexes, and FK constraints
-- **Tests**: 97 unit tests (7 suites) covering entities, enums, and migration SQL
-
-### Dashboard (`dashboard/`)
-Frontend application to visualize consumption trends, utilization metrics, underused resources, and optimization opportunities. *(Scaffold pending — TASK-014)*
-- Port: **3002**
-
-### AI Agents (`ai-agents/`) — TBD
-Agents designed to analyze cloud consumption data and recommend optimizations. Last phase of the project.
+This project is licensed under the MIT License.
