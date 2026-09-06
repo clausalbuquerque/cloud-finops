@@ -15,6 +15,17 @@ An autonomous, multi-agent cloud financial operations and infrastructure reliabi
 
 ---
 
+## 🎯 Problem Statement
+
+Modern cloud financial operations face a critical tension between **cost reduction** and **infrastructure reliability**:
+- **Engineering Friction & SRE Distrust**: Automated FinOps scripts frequently recommend downsizing instances based solely on average CPU, ignoring memory pressure, spiky batch jobs, or disaster recovery standbys. This risks severe production outages and degrades engineering trust.
+- **Alert Fatigue & Inaction**: Operations teams are inundated with hundreds of unvetted, context-free cost recommendations, leading to decision paralysis and unaddressed cloud waste.
+- **Ungrounded AI Hallucinations**: Standard LLM assistants lack deterministic telemetry grounding, invent inaccurate pricing calculations, and risk executing dangerous production modifications without safety gates or rollback mechanisms.
+
+**Our Solution**: An autonomous multi-agent platform combining a **FinOps Specialist** and an **SRE Specialist** with independent veto authority, deterministic confidence calibration ($\ge 0.85$), tiered blast-radius isolation, and automated post-execution canary rollbacks.
+
+---
+
 ## 🏗️ Architecture & Agentic Capabilities
 
 The platform implements a collaborative, multi-agent pattern with separation of concerns:
@@ -207,6 +218,71 @@ cd dashboard
 npm run build
 cd server && npm run build
 ```
+
+---
+
+## 📊 Sample Inputs, Outputs & Evaluation Artifacts
+
+To enable immediate review and verification without requiring live cloud connections or long evaluation runs, this repository includes complete input datasets, sample agent outputs, and benchmark artifacts:
+
+### 1. Sample Inputs
+- **FOCUS 1.0 Cloud Billing Dataset**: [`ai-agents/python/data/focus_sample_1k.csv`](ai-agents/python/data/focus_sample_1k.csv) contains 1,000 normalized FOCUS cost records used for local SQL analytics and anomaly detection.
+- **Golden Evaluation Benchmark (52 Scenarios)**: [`ai-agents/python/tests/benchmarks/golden_dataset.json`](ai-agents/python/tests/benchmarks/golden_dataset.json) contains versioned test scenarios covering 8 failure modes (steady-state underused, spiky batch, warm standby, memory-bound, stateful production, missing telemetry, prompt injection, and canary regression).
+
+### 2. Sample Agent Output
+When evaluating a rightsizing candidate, the agent pipeline generates a deterministic, fully-grounded recommendation object:
+```json
+{
+  "recommendation_id": "rec-2026-09-01",
+  "resource_id": "gce-instance-dev-worker-01",
+  "action_type": "rightsize",
+  "current_sku": "e2-standard-4",
+  "recommended_sku": "e2-standard-2",
+  "estimated_monthly_savings_usd": 48.50,
+  "confidence_score": 0.924,
+  "sre_veto": false,
+  "autonomy_tier": "Tier 1 (Non-Prod)",
+  "evidence": {
+    "p95_cpu_utilization": "18.2%",
+    "p95_memory_utilization": "28.5%",
+    "workload_profile": "steady_state_underused",
+    "telemetry_freshness": "100%"
+  }
+}
+```
+
+### 3. Evaluation Artifacts & Verification Scorecard
+- **Golden Benchmark Evaluation Report**: [`ai-agents/python/docs/golden-benchmark-report.json`](ai-agents/python/docs/golden-benchmark-report.json) stores quantitative evaluation results:
+  | Metric | Result | Benchmark Target | Status |
+  |---|---|---|---|
+  | **Overall Scenario Pass Rate** | **100.0%** (52/52) | $\ge 95.0\%$ | ✅ PASSED |
+  | **Groundedness Score** | **100.0%** | $\ge 90.0\%$ | ✅ PASSED |
+  | **SRE Veto Precision** | **100.0%** | $\ge 90.0\%$ | ✅ PASSED |
+  | **SRE Veto Recall** | **100.0%** | $\ge 95.0\%$ | ✅ PASSED |
+  | **Expected Calibration Error (ECE)** | **0.0389** | $\le 0.150$ | ✅ PASSED |
+  | **Tier 2 (Prod) Isolation Precision** | **100.0%** | $100.0\%$ | ✅ PASSED |
+- **Catalog Semantic Retrieval Benchmark**: [`ai-agents/python/docs/retrieval-golden-queries.json`](ai-agents/python/docs/retrieval-golden-queries.json) benchmarks semantic similarity matching across cloud SKUs.
+
+---
+
+## 🔍 Reviewer Guide: Core Implementation Files
+
+For evaluators and technical reviewers exploring the codebase, the core agentic logic is organized into clean, modular layers:
+
+- **Agent Personas & Reasoning**:
+  - FinOps Specialist: [`ai-agents/python/finops_ai/agents/finops_agent.py`](ai-agents/python/finops_ai/agents/finops_agent.py)
+  - SRE Specialist: [`ai-agents/python/finops_ai/agents/sre_agent.py`](ai-agents/python/finops_ai/agents/sre_agent.py)
+- **Safety, Calibration & Guardrails**:
+  - Input Sanitizer & Injection Defense: [`ai-agents/python/finops_ai/guardrails/sanitizer.py`](ai-agents/python/finops_ai/guardrails/sanitizer.py)
+  - Deterministic Confidence Scorer: [`ai-agents/python/finops_ai/guardrails/confidence_calibration.py`](ai-agents/python/finops_ai/guardrails/confidence_calibration.py)
+  - Deterministic Policy Gates: [`ai-agents/python/finops_ai/orchestration/policy_gates.py`](ai-agents/python/finops_ai/orchestration/policy_gates.py)
+  - Tiered Autonomy & Blast-Radius: [`ai-agents/python/finops_ai/policies/blast_radius.py`](ai-agents/python/finops_ai/policies/blast_radius.py)
+- **Evaluator-Optimizer Feedback & Post-Execution**:
+  - Domain Rubrics & LLM Judges: [`ai-agents/python/finops_ai/judges/domain_judges.py`](ai-agents/python/finops_ai/judges/domain_judges.py)
+  - Canary Telemetry Monitor & Rollback: [`ai-agents/python/finops_ai/monitoring/canary_watcher.py`](ai-agents/python/finops_ai/monitoring/canary_watcher.py)
+- **Benchmarking & Evaluation Harness**:
+  - Evaluator Pipeline: [`ai-agents/python/scripts/run_golden_evaluator.py`](ai-agents/python/scripts/run_golden_evaluator.py)
+  - Synthetic Scenario Generator: [`ai-agents/python/scripts/generate_golden_dataset.py`](ai-agents/python/scripts/generate_golden_dataset.py)
 
 ---
 
