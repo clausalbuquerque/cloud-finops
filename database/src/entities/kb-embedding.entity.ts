@@ -29,6 +29,7 @@ export class KbEmbeddingEntity {
    * pgvector column. TypeORM does not include 'vector' in older typings,
    * so it is intentionally cast to keep compatibility.
    */
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   @Column({ type: 'vector' as any, length: 768 })
   embedding: number[];
 

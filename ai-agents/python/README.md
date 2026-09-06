@@ -24,6 +24,39 @@ cd ai-agents/python
 uv run --python .venv/bin/python python -m unittest discover -s tests -p "test_*.py"
 ```
 
+## Agent runtime (CrewAI + Gemini via Vertex AI)
+
+The FinOps/SRE agents run on **CrewAI** with **Google Gemini via Vertex AI**. See
+[ADR: Agent Runtime](docs/../../docs/adr-agent-runtime.md) for the design.
+
+Install (after `./scripts/sync-env.sh` from the repo root has populated `.env`):
+
+```bash
+cd ai-agents/python
+uv pip install --python .venv/bin/python -e .
+```
+
+Build an LLM in code via the single factory (model tier per role):
+
+```python
+from finops_ai.llm import build_llm
+
+llm = build_llm("pro")     # gemini/gemini-2.5-pro   (deep reasoning)
+llm = build_llm("flash")   # gemini/gemini-2.5-flash (cheap/fast)
+```
+
+`build_llm()` reads `GCP_AGENTS_API_KEY` (Vertex AI Express mode) from `.env`, sets
+`GOOGLE_GENAI_USE_VERTEXAI=true`, and injects `truststore` so TLS works behind
+enterprise CA chains. For production, leave the key empty and use ADC
+(`gcloud auth application-default login`) with `GOOGLE_CLOUD_PROJECT` / `GOOGLE_CLOUD_LOCATION`.
+
+Validate the runtime with the hello-flow smoke test (makes one live Gemini call):
+
+```bash
+uv run --python .venv/bin/python python scripts/run_hello_flow.py
+# -> Flow result: 'FINOPS_OK'  /  Health check: PASS
+```
+
 ## Containerized runtime
 
 ```bash

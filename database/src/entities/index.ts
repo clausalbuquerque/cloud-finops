@@ -23,3 +23,18 @@ export { KbDocumentEntity } from './kb-document.entity';
 export { KbChunkEntity } from './kb-chunk.entity';
 export { KbEmbeddingEntity } from './kb-embedding.entity';
 export { KbIngestionRunEntity } from './kb-ingestion-run.entity';
+
+// Agent long-term memory entities
+export { OptimizationRecommendationEntity } from './optimization-recommendation.entity';
+export { AnomalyResolutionEntity } from './anomaly-resolution.entity';
+export { InfrastructureBaselineEntity } from './infrastructure-baseline.entity';
+export { AgentInteractionMemoryEntity } from './agent-interaction-memory.entity';
+
+// Predictions entities
+export { CostForecastEntity } from './cost-forecast.entity';
+export {
+  CostAnomalyEntity,
+  AnomalySeverity,
+  AnomalyType,
+  AnomalyStatus,
+} from './cost-anomaly.entity';

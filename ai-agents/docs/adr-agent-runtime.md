@@ -97,13 +97,34 @@ Responsibilities that live in the **Flow (code)**, not in an LLM:
 - Policy gates before output: freshness, confidence threshold, prior-rejection check, dependency safety, fail-closed default.
 - HITL approval and final response assembly.
 
+## Domain-Specialist Judge Agents (Evaluator-Optimizer Reflection Loop)
+
+**Decision: Domain-Specialist Judge Agents evaluate specialist outputs and drive reflection loops before state moves forward.**
+
+To guarantee evidence grounding, mathematical accuracy, and operational safety:
+- **FinOps Judge (`FinOpsJudgeAgent` / `FinOpsJudgeEvaluator`):** Evaluates financial reasoning against four dimensions:
+  1. *Evidence Grounding (40%):* Zero-tolerance for unverified or hallucinated dollar amounts, dates, or resource IDs.
+  2. *Mathematical Consistency (25%):* Validates cost deltas and projected savings calculations.
+  3. *Long-Term Memory Compliance (20%):* Verifies that `get_optimization_history` was consulted before proposing actions.
+  4. *Scope Integrity (15%):* Enforces team-level data isolation.
+- **SRE Judge (`SREJudgeAgent` / `SREJudgeEvaluator`):** Evaluates infrastructure safety against four dimensions:
+  1. *Operational Headroom (35%):* Verifies peak P95 CPU < 75% and peak Memory < 80% buffers.
+  2. *Workload Baseline Awareness (25%):* Verifies `get_infrastructure_baselines` to protect batch/scheduled workloads from false positives.
+  3. *Dependency Safety (20%):* Assesses blast radius and downstream dependencies.
+  4. *Action Viability (20%):* Validates technical migration feasibility.
+- **Flow Reflection Control:** The CrewAI Flow runs the `EvaluatorOptimizer` loop with a deterministic retry bound (`max_iterations = 2`). If an evaluation returns `verdict = REVISE`, structured critique and actionable steps are injected into the next iteration prompt. If an output repeatedly fails, it is escalated for human review with the judge's audit report attached.
+
 ```mermaid
 flowchart TD
     S["@start: query / trigger"] --> M["load memory (short-term + interaction)"]
     M --> F["FinOps Agent — ReAct (SQL tools)"]
-    F --> R{"needs infra context?"}
-    R -- yes --> SRE["SRE Agent — ReAct (delegation tool)"]
-    SRE --> F
+    F --> FJ["FinOps Domain Judge (Evidence, Math, Memory)"]
+    FJ -->|REVISE (retries < 2)| F
+    FJ -->|PASS| R{"needs infra context?"}
+    R -- yes --> SRE["SRE Agent — ReAct (Infra tools)"]
+    SRE --> SJ["SRE Domain Judge (Headroom, Baselines, Risk)"]
+    SJ -->|REVISE (retries < 2)| SRE
+    SJ -->|PASS| F
     R -- no --> G["policy gates: freshness · confidence · prior-rejection · dependency safety"]
     G --> RAG["retrieve_provider_context (render step ONLY)"]
     RAG --> H["@human_feedback gate (propose→approve→execute)"]
@@ -111,6 +132,7 @@ flowchart TD
     H -->|needs_revision| F
     H -->|rejected| L["log rejection_reason to memory"]
 ```
+
 
 ## Inter-agent delegation
 

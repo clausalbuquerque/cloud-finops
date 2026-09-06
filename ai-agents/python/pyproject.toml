@@ -17,6 +17,13 @@ dependencies = [
   "beautifulsoup4==4.14.2",
   "pypdf==6.0.0",
   "psycopg[binary]>=3.3.4",
+  "crewai[google-genai]>=1.15",
+  "python-dotenv>=1.0",
+  "fastapi>=0.141.1",
+  "uvicorn>=0.52.4",
+  "crewai-tools>=0.76.0",
+  "mcp>=1.28.1",
+  "litellm>=1.98.0",
 ]
 
 [tool.setuptools]

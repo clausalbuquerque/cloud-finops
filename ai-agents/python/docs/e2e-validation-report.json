@@ -1,13 +1,75 @@
 {
-  "analysis_summary": "Anomaly: CPU utilization below 30% for 14 days\nForecast: Projected steady usage over next 30 days",
-  "e2e_actionable_recommendation": true,
-  "retrieval_used": true,
-  "retrieval_candidates": 58,
-  "retrieval_returned": 5,
-  "retrieval_latency_ms": 42.78,
-  "recommendation_latency_ms": 641.16,
-  "slo_passed": true,
-  "slo_violations": [],
-  "stale_safeguard_passed": true,
-  "source_citation_count": 5
+  "generated_at": "2026-08-22T16:08:18.832056+00:00",
+  "total_scenarios": 3,
+  "passed_scenarios": 3,
+  "failed_scenarios": 0,
+  "all_passed": true,
+  "slo_evaluation": {
+    "passed": true,
+    "violations": [],
+    "average_flow_latency_ms": 314.35,
+    "threshold_recommendation_latency_ms": 3000.0
+  },
+  "scenarios": [
+    {
+      "scenario_id": "scenario_1",
+      "name": "Cost Spike Root Cause Attribution",
+      "passed": true,
+      "latency_ms": 938.35,
+      "summary": "Attributed compute cost anomaly to analytics-worker-02 ad-hoc indexing run.",
+      "verifications": {
+        "flow_completed": true,
+        "policy_passed": true,
+        "resource_attributed": true,
+        "spike_identified": true,
+        "trace_recorded": true
+      },
+      "details": {
+        "session_id": "d0e255cb-c25b-411f-bd72-95bc2ba8d01a",
+        "trace_id": "159059a1-0815-4070-8c5a-5730493e3246",
+        "policy_violations": []
+      }
+    },
+    {
+      "scenario_id": "scenario_2",
+      "name": "Underused VM Rightsizing with SRE Safety & HITL Approval",
+      "passed": true,
+      "latency_ms": 2.69,
+      "summary": "Validated rightsizing with SRE safety checks, generated provider CLI, approved, and executed with rollback protection.",
+      "verifications": {
+        "flow_completed": true,
+        "policy_passed": true,
+        "sre_headroom_validated": true,
+        "rag_cli_rendered": true,
+        "hitl_proposed": true,
+        "hitl_approved": true,
+        "hitl_executed": true,
+        "rollback_plan_generated": true,
+        "drift_below_threshold": true
+      },
+      "details": {
+        "execution_command": "gcloud compute instances set-machine-type analytics-worker-02 --machine-type=n2-standard-8",
+        "rollback_command": "gcloud compute instances set-machine-type analytics-worker-02 --machine-type=n2-standard-16",
+        "projected_monthly_savings": 142.25
+      }
+    },
+    {
+      "scenario_id": "scenario_3",
+      "name": "End-of-Month Spend Forecast & Commitment Analysis",
+      "passed": true,
+      "latency_ms": 2.0,
+      "summary": "Multi-tool forecast combining time-series projections, commitment coverage, and budget tracking.",
+      "verifications": {
+        "flow_completed": true,
+        "policy_passed": true,
+        "forecast_projected": true,
+        "commitment_coverage_analyzed": true,
+        "budget_margin_evaluated": true
+      },
+      "details": {
+        "projected_spend": 4850.0,
+        "budget": 5000.0
+      }
+    }
+  ]
 }

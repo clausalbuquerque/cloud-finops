@@ -51,3 +51,10 @@ docker-compose.override.yml
 # Temporary files
 tmp/
 temp/
+
+# Scratch testing scripts
+/test-curl.py
+/test.js
+/test_iterator.py
+/ai-agents/python/test_agent.py
+/ai-agents/python/test_mcp.py
